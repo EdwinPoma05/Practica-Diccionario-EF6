@@ -10,5 +10,13 @@ namespace Diccionario
     public class TallerContext: DbContext
     {
         public DbSet<Repuesto> Repuestos { get; set; }
+
+
+        public TallerContext() : base("name=ConexionBasedeDatosTaller")
+        {
+
+        }
     }
+
+    
 }
