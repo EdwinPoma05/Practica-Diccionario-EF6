@@ -12,11 +12,26 @@ Repuesto respuesto = new Repuesto
 
 TallerContext contexto = new TallerContext();
 
-contexto.Repuestos.Add(respuesto);
+//contexto.Repuestos.Add(respuesto);
 
 
-contexto.SaveChanges();
+//contexto.SaveChanges();
+
+List<Repuesto> ListaRepuestos =contexto.Repuestos.ToList();
+
+Console.WriteLine($"{ListaRepuestos}");
 
 
+Dictionary<string,Repuesto> diccionarioRespuesto=new Dictionary<string,Repuesto>(); 
 
-Console.WriteLine("Repuesto agregado correctamente.");
+for(int i = 0;i< ListaRepuestos.Count; i++)
+{
+    if (diccionarioRespuesto.ContainsKey(ListaRepuestos[i].Codigo))
+    {
+        Console.WriteLine("Ya existe un repuesto con el mismo código");
+    }
+    
+    Console.WriteLine($"{ListaRepuestos[i].Nombre}");
+    Console.WriteLine($"{ListaRepuestos[i].Codigo}");
+}
+
