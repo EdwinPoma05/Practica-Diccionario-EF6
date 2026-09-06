@@ -22,16 +22,36 @@ List<Repuesto> ListaRepuestos =contexto.Repuestos.ToList();
 Console.WriteLine($"{ListaRepuestos}");
 
 
-Dictionary<string,Repuesto> diccionarioRespuesto=new Dictionary<string,Repuesto>(); 
+Dictionary<string,Repuesto> diccionarioRepuesto=new Dictionary<string,Repuesto>(); 
 
 for(int i = 0;i< ListaRepuestos.Count; i++)
 {
-    if (diccionarioRespuesto.ContainsKey(ListaRepuestos[i].Codigo))
+    if (diccionarioRepuesto.ContainsKey(ListaRepuestos[i].Codigo))
     {
         Console.WriteLine("Ya existe un repuesto con el mismo código");
     }
+    else
+    {
+        Console.WriteLine($"{ListaRepuestos[i].Nombre} {ListaRepuestos[i].Codigo}");
+        diccionarioRepuesto.Add(ListaRepuestos[i].Codigo, ListaRepuestos[i]);
+    }
+
+   
     
-    Console.WriteLine($"{ListaRepuestos[i].Nombre}");
-    Console.WriteLine($"{ListaRepuestos[i].Codigo}");
+}
+Console.WriteLine("Ingrese el código del repuesto a buscar");
+Repuesto respuestoBuscado=new Repuesto();
+string? codigo = Console.ReadLine();
+if (string.IsNullOrEmpty(codigo))
+{
+    Console.WriteLine("El código no puede estar vacío");
+}
+else if (diccionarioRepuesto.TryGetValue(codigo, out respuestoBuscado)){
+    Console.WriteLine("Se encontro el repuesto");
+    Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
+}
+else
+{
+       Console.WriteLine("No se encontro el repuesto");
 }
 
