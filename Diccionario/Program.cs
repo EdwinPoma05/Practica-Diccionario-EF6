@@ -36,7 +36,7 @@ for(int i = 0;i< ListaRepuestos.Count; i++)
         diccionarioRepuesto.Add(ListaRepuestos[i].Codigo.ToUpper().Trim(), ListaRepuestos[i]);
     }
 }
-
+bool validador = true;
 
 Console.WriteLine("Bievenido al sistema de repuestos");
 Console.WriteLine("================================");
@@ -45,6 +45,7 @@ Console.WriteLine("1.- Buscar repuesto");
 Console.WriteLine("2.- Agregar repuesto");
 Console.WriteLine("3.- Listar Respuestos");
 Console.WriteLine("4.- Salir");
+
 
 string? opcionIntroducida =Console.ReadLine();
 int opcionSeleccionada;
@@ -82,15 +83,36 @@ if(int.TryParse(opcionIntroducida, out opcionSeleccionada)){
 
          case 2:
 
-            Console.WriteLine("Ingrese el codigo del Respuesto a agregar");
-            string? codigoIngresado = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(codigoIngresado))
+            do
             {
-                Console.WriteLine("Ingrese un codigo valido");
-            }
+                Console.WriteLine("Ingrese el codigo del Respuesto a agregar");
+                string? codigoIngresado = Console.ReadLine();
 
-            Console.WriteLine("Ingrese el nombre del repuesto a agregar");
+
+
+                if (string.IsNullOrWhiteSpace(codigoIngresado))
+                {
+                    Console.WriteLine("Ingrese un codigo valido");
+                }
+                else
+                {
+                    string codigoNormalizado = codigoIngresado.ToUpper().Trim();
+
+                    if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
+                    {
+                        Console.WriteLine("El codigo ya esta registrado");
+                    }
+                    else
+                    {
+
+                    }
+
+                }
+            } while (validador);
+           
+
+                Console.WriteLine("Ingrese el nombre del repuesto a agregar");
             string? nombreIngresado= Console.ReadLine();
             if (string.IsNullOrWhiteSpace(nombreIngresado))
             {
