@@ -37,179 +37,221 @@ for(int i = 0;i< ListaRepuestos.Count; i++)
     }
 }
 
+bool continuarPrograma = true;
 
-Console.WriteLine("Bievenido al sistema de repuestos");
-Console.WriteLine("================================");
-Console.WriteLine("Por favor ingrese la opcion que desea realizar");
-Console.WriteLine("1.- Buscar repuesto");
-Console.WriteLine("2.- Agregar repuesto");
-Console.WriteLine("3.- Listar Respuestos");
-Console.WriteLine("4.- Salir");
+do
+{
 
 
-string? opcionIntroducida =Console.ReadLine();
+    Console.WriteLine("Bievenido al sistema de repuestos");
+    Console.WriteLine("================================");
+    Console.WriteLine("Por favor ingrese la opcion que desea realizar");
+    Console.WriteLine("1.- Buscar repuesto");
+    Console.WriteLine("2.- Agregar repuesto");
+    Console.WriteLine("3.- Listar Respuestos");
+    Console.WriteLine("4.- Salir");
 
-bool validador = true;
-int opcionSeleccionada;
-string codigoValido = "";
-string nombreValido = "";
-int stockValido = 0;
-decimal decimalValido = 0;
 
-if (int.TryParse(opcionIntroducida, out opcionSeleccionada)){
-    switch (opcionSeleccionada)
+    string? opcionIntroducida = Console.ReadLine();
+
+    bool validador = true;
+    int opcionSeleccionada;
+    string codigoValido = "";
+    string nombreValido = "";
+    int stockValido = 0;
+    decimal decimalValido = 0;
+
+    if (int.TryParse(opcionIntroducida, out opcionSeleccionada))
     {
-        case 1:
+        switch (opcionSeleccionada)
+        {
+            case 1:
 
 
 
-            Console.WriteLine("Ingrese el código del repuesto a buscar");
-            Repuesto respuestoBuscado = new Repuesto();
-            string? codigo = Console.ReadLine();
+                Console.WriteLine("Ingrese el código del repuesto a buscar");
+                Repuesto respuestoBuscado = new Repuesto();
+                string? codigo = Console.ReadLine();
 
-            if (string.IsNullOrWhiteSpace(codigo))
-            {
-                Console.WriteLine("El código no puede estar vacío");
-            }
-            else
-            {
-                string codigoNormalizado = codigo.ToUpper().Trim();
-                if (diccionarioRepuesto.TryGetValue(codigoNormalizado, out respuestoBuscado))
+                if (string.IsNullOrWhiteSpace(codigo))
                 {
-                    Console.WriteLine("Se encontro el repuesto");
-                    Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
+                    Console.WriteLine("El código no puede estar vacío");
                 }
                 else
                 {
-                    Console.WriteLine("No se encontro el repuesto");
-                }
-            }
-
-         break;
-
-         case 2:
-
-
-            do
-            {
-                Console.WriteLine("Ingrese el codigo del Respuesto a agregar");
-                string? codigoIngresado = Console.ReadLine();
-
-
-
-                if (string.IsNullOrWhiteSpace(codigoIngresado))
-                {
-                    Console.WriteLine("Ingrese un codigo valido");
-                }
-                else
-                {
-                    string codigoNormalizado = codigoIngresado.ToUpper().Trim();
-
-                    if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
+                    string codigoNormalizado = codigo.ToUpper().Trim();
+                    if (diccionarioRepuesto.TryGetValue(codigoNormalizado, out respuestoBuscado))
                     {
-                        Console.WriteLine("El codigo ya esta registrado");
+                        Console.WriteLine("Se encontro el repuesto");
+                        Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
                     }
                     else
                     {
-                        codigoValido= codigoNormalizado;
-                        validador = false;
+                        Console.WriteLine("No se encontro el repuesto");
                     }
-
                 }
-            } while (validador);
-            do
-            {
-                Console.WriteLine("Ingrese el nombre del repuesto a agregar");
-                string? nombreIngresado = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(nombreIngresado))
-                {
-                    Console.WriteLine("Ingrese un nombre valido");
-                    validador = true;
-                }
-                else
-                {
-                    validador = false;
-                    string nombreNormalizado = nombreIngresado.ToUpper().Trim();
-                    nombreValido = nombreNormalizado;
-                }
+                
+                break;
 
-            } while (validador);
+            case 2:
 
-            do
-            {
-                Console.WriteLine("Ingrese el stock del repuesto a agregar");
-                string? stockIngresado = Console.ReadLine();
-                if (int.TryParse(stockIngresado, out int stock))
+
+                do
                 {
-                    if (stock > 0)
+                    Console.WriteLine("Ingrese el codigo del Respuesto a agregar");
+                    string? codigoIngresado = Console.ReadLine();
+
+
+
+                    if (string.IsNullOrWhiteSpace(codigoIngresado))
                     {
-                        validador = false;
-                        stockValido = stock;
-
+                        Console.WriteLine("Ingrese un codigo valido");
                     }
                     else
                     {
-                        Console.WriteLine("Ingrese un stock mayor a 0");
+                        string codigoNormalizado = codigoIngresado.ToUpper().Trim();
+
+                        if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
+                        {
+                            Console.WriteLine("El codigo ya esta registrado");
+                        }
+                        else
+                        {
+                            codigoValido = codigoNormalizado;
+                            validador = false;
+                        }
+
+                    }
+                } while (validador);
+                do
+                {
+                    Console.WriteLine("Ingrese el nombre del repuesto a agregar");
+                    string? nombreIngresado = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(nombreIngresado))
+                    {
+                        Console.WriteLine("Ingrese un nombre valido");
                         validador = true;
-                    }         
-                }
-                else
-                {
-                    Console.WriteLine("Ingrese un stock valido");
-                    validador = true;
-                }
-
-            } while (validador);
-
-
-            do{
-                Console.WriteLine("Ingrese el precio del repuesto a agregar");
-                string? precioIngresado = Console.ReadLine();
-                if (decimal.TryParse(precioIngresado, out decimal precio))
-                {
-                    if(precio > 0)
-                    {
-                        validador = false;
-                        decimalValido = precio;
                     }
                     else
                     {
-                        validador = true;
-                        Console.WriteLine("Ingrese un precio mayor a 0");
+                        validador = false;
+                        string nombreNormalizado = nombreIngresado.ToUpper().Trim();
+                        nombreValido = nombreNormalizado;
                     }
-                    
-                   
-                }
-                else
+
+                } while (validador);
+
+                do
                 {
-                    Console.WriteLine("Ingrese un precio valido");
-                    validador = true;
+                    Console.WriteLine("Ingrese el stock del repuesto a agregar");
+                    string? stockIngresado = Console.ReadLine();
+                    if (int.TryParse(stockIngresado, out int stock))
+                    {
+                        if (stock > 0)
+                        {
+                            validador = false;
+                            stockValido = stock;
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ingrese un stock mayor a 0");
+                            validador = true;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ingrese un stock valido");
+                        validador = true;
+                    }
+
+                } while (validador);
+
+
+                do
+                {
+                    Console.WriteLine("Ingrese el precio del repuesto a agregar");
+                    string? precioIngresado = Console.ReadLine();
+                    if (decimal.TryParse(precioIngresado, out decimal precio))
+                    {
+                        if (precio > 0)
+                        {
+                            validador = false;
+                            decimalValido = precio;
+                        }
+                        else
+                        {
+                            validador = true;
+                            Console.WriteLine("Ingrese un precio mayor a 0");
+                        }
+
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ingrese un precio valido");
+                        validador = true;
+                    }
+                } while (validador);
+
+                Repuesto nuevoRespuesto = new Repuesto
+                {
+                    Codigo = codigoValido,
+                    Nombre = nombreValido,
+                    Stock = stockValido,
+                    Precio = decimalValido,
+                    Estado = true
+                };
+
+                contexto.Repuestos.Add(nuevoRespuesto);
+                contexto.SaveChanges();
+
+                diccionarioRepuesto.Add(codigoValido, nuevoRespuesto);
+
+                Console.WriteLine("Repesto agregado correctamente");
+                Console.WriteLine($"Codigo:{codigoValido}");
+                Console.WriteLine($"Nombre:{nombreValido}");
+                Console.WriteLine($"Stock:{stockValido}");
+                Console.WriteLine($"Precio:{decimalValido}");
+
+                
+                break;
+
+            case 3:
+                Console.WriteLine("Listado de repuestos");
+                Console.WriteLine("====================");
+
+                List<Repuesto> ListaActualRepuesto = contexto.Repuestos.ToList();
+                for (int i = 0; ListaActualRepuesto.Count > i; i++)
+                {
+                    Console.WriteLine($"{ListaActualRepuesto[i].Nombre}");
+                    Console.WriteLine($"{ListaActualRepuesto[i].Codigo}");
+                    Console.WriteLine($"{ListaActualRepuesto[i].Stock}");
+                    Console.WriteLine($"{ListaActualRepuesto[i].Precio}");
                 }
-            } while (validador) ;
+                
+                break;
 
-            Repuesto nuevoRespuesto = new Repuesto
-            {
-                Codigo = codigoValido,
-                Nombre = nombreValido,
-                Stock = stockValido,
-                Precio = decimalValido,
-                Estado = true
-            };
+            case 4:
 
-            contexto.Repuestos.Add(nuevoRespuesto);
-            contexto.SaveChanges();
+                continuarPrograma = false;
+                break;
 
-            diccionarioRepuesto.Add(codigoValido,nuevoRespuesto);
+            default:
+                Console.WriteLine("Ingrese una opcion valida");
+                continuarPrograma = true;
+                break;
+        }
 
-            Console.WriteLine("Repesto agregado correctamente");
-            Console.WriteLine($"{codigoValido}");
-            Console.WriteLine($"{nombreValido}");
-            Console.WriteLine($"{stockValido}");
-            Console.WriteLine($"{decimalValido}");
-
-            break;
     }
-}
+    else
+    {
+        Console.WriteLine("Ingrese una opcion valida");
+        continuarPrograma = true;
+    }
+} while (continuarPrograma);
+
+
 
 
 
