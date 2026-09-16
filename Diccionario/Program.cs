@@ -50,6 +50,7 @@ do
     Console.WriteLine("2.- Agregar repuesto");
     Console.WriteLine("3.- Listar Respuestos");
     Console.WriteLine("4.- Salir");
+    Console.WriteLine("5.- Actualizar stock de repuesto");
 
 
     string? opcionIntroducida = Console.ReadLine();
@@ -237,10 +238,56 @@ do
                 continuarPrograma = false;
                 break;
 
+            case 5:
+
+                Console.WriteLine("Ingrese el codigo de repuesto a actualizar su stcock");
+                string? codigoIngresadoaEditar=Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(codigoIngresadoaEditar))
+                {
+                    Console.WriteLine("Ingrese un codigo valido");
+                }
+                else if (diccionarioRepuesto.TryGetValue(codigoIngresadoaEditar.ToUpper().Trim(), out Repuesto repuestoEncontrado))
+                {
+                    Console.WriteLine("Ingrese el nuevo stock del repuesto");
+
+                    if(int.TryParse(Console.ReadLine(),out int stockActualizado))
+                    {
+                        if (stockActualizado >= 0) {
+
+                            
+                            
+                            Console.WriteLine($"Stock anterior {repuestoEncontrado.Stock}");
+                            repuestoEncontrado.Stock = stockActualizado;
+                            contexto.SaveChanges();
+                            Console.WriteLine($"Stock actualizado {repuestoEncontrado.Stock}");
+                            Console.WriteLine("Stock actualizado correctamente");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ingrese un stock mayor o igual a 0");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Ingrese un stock valido");
+                    }
+
+                }
+                else
+                {
+                        Console.WriteLine("No se encontro el repuesto");
+                }
+
+
+                    break;
+
             default:
                 Console.WriteLine("Ingrese una opcion valida");
                 continuarPrograma = true;
                 break;
+
+
         }
 
     }
