@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Diccionario;
+using System.ComponentModel.DataAnnotations;
 
 Repuesto respuesto = new Repuesto
 {
@@ -22,10 +23,11 @@ List<Repuesto> ListaRepuestos =contexto.Repuestos.ToList();
 //Console.WriteLine($"{ListaRepuestos[0]}");
 
 
-Dictionary<string,Repuesto> diccionarioRepuesto=new Dictionary<string,Repuesto>(); 
 
-for(int i = 0;i< ListaRepuestos.Count; i++)
+Dictionary<string, Repuesto> diccionarioRepuesto = new Dictionary<string, Repuesto>();
+for (int i = 0;i< ListaRepuestos.Count; i++)
 {
+   
     if (diccionarioRepuesto.ContainsKey(ListaRepuestos[i].Codigo.ToUpper().Trim()))
     {
         Console.WriteLine("Ya existe un repuesto con el mismo código");
@@ -71,31 +73,15 @@ do
 
 
                 Console.WriteLine("Ingrese el código del repuesto a buscar");
-                Repuesto respuestoBuscado = new Repuesto();
+                
                 string? codigo = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(codigo))
-                {
-                    Console.WriteLine("El código no puede estar vacío");
-                }
-                else
-                {
-                    string codigoNormalizado = codigo.ToUpper().Trim();
-                    if (diccionarioRepuesto.TryGetValue(codigoNormalizado, out respuestoBuscado))
-                    {
-                        Console.WriteLine("Se encontro el repuesto");
-                        Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("No se encontro el repuesto");
-                    }
-                }
+                BuscarRepuestos(codigo, diccionarioRepuesto);
                 
                 break;
 
             case 2:
-
+               
 
                 do
                 {
@@ -104,25 +90,7 @@ do
 
 
 
-                    if (string.IsNullOrWhiteSpace(codigoIngresado))
-                    {
-                        Console.WriteLine("Ingrese un codigo valido");
-                    }
-                    else
-                    {
-                        string codigoNormalizado = codigoIngresado.ToUpper().Trim();
-
-                        if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
-                        {
-                            Console.WriteLine("El codigo ya esta registrado");
-                        }
-                        else
-                        {
-                            codigoValido = codigoNormalizado;
-                            validador = false;
-                        }
-
-                    }
+                   
                 } while (validador);
                 do
                 {
@@ -206,7 +174,7 @@ do
 
                 contexto.Repuestos.Add(nuevoRespuesto);
                 contexto.SaveChanges();
-
+              
                 diccionarioRepuesto.Add(codigoValido, nuevoRespuesto);
 
                 Console.WriteLine("Repesto agregado correctamente");
@@ -221,16 +189,7 @@ do
             case 3:
                 Console.WriteLine("Listado de repuestos");
                 Console.WriteLine("====================");
-
-                List<Repuesto> ListaActualRepuesto = contexto.Repuestos.ToList();
-                for (int i = 0; ListaActualRepuesto.Count > i; i++)
-                {
-                    Console.WriteLine($"{ListaActualRepuesto[i].Nombre}");
-                    Console.WriteLine($"{ListaActualRepuesto[i].Codigo}");
-                    Console.WriteLine($"{ListaActualRepuesto[i].Stock}");
-                    Console.WriteLine($"{ListaActualRepuesto[i].Precio}");
-                }
-                
+                ListarRepuestos(contexto);
                 break;
 
             case 4:
@@ -240,47 +199,11 @@ do
 
             case 5:
 
-                Console.WriteLine("Ingrese el codigo de repuesto a actualizar su stcock");
+                Console.WriteLine("Ingrese el codigo de repuesto a actualizar su stock");
                 string? codigoIngresadoaEditar=Console.ReadLine();
+                ActualizarStock(codigoIngresadoaEditar, diccionarioRepuesto, contexto);
 
-                if (string.IsNullOrWhiteSpace(codigoIngresadoaEditar))
-                {
-                    Console.WriteLine("Ingrese un codigo valido");
-                }
-                else if (diccionarioRepuesto.TryGetValue(codigoIngresadoaEditar.ToUpper().Trim(), out Repuesto repuestoEncontrado))
-                {
-                    Console.WriteLine("Ingrese el nuevo stock del repuesto");
-
-                    if(int.TryParse(Console.ReadLine(),out int stockActualizado))
-                    {
-                        if (stockActualizado >= 0) {
-
-                            
-                            
-                            Console.WriteLine($"Stock anterior {repuestoEncontrado.Stock}");
-                            repuestoEncontrado.Stock = stockActualizado;
-                            contexto.SaveChanges();
-                            Console.WriteLine($"Stock actualizado {repuestoEncontrado.Stock}");
-                            Console.WriteLine("Stock actualizado correctamente");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Ingrese un stock mayor o igual a 0");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ingrese un stock valido");
-                    }
-
-                }
-                else
-                {
-                        Console.WriteLine("No se encontro el repuesto");
-                }
-
-
-                    break;
+                break;
 
             default:
                 Console.WriteLine("Ingrese una opcion valida");
@@ -300,7 +223,102 @@ do
 
 
 
+void BuscarRepuestos(string? codigoBuscado, Dictionary<string, Repuesto> diccionarioRepuesto)
+{
+    Repuesto respuestoBuscado = new Repuesto();
+   
+    if (string.IsNullOrWhiteSpace(codigoBuscado))
+    {
+        Console.WriteLine("El código no puede estar vacío");
+    }
+    else
+    {
+        string codigoNormalizado = codigoBuscado.ToUpper().Trim();
+        if (diccionarioRepuesto.TryGetValue(codigoNormalizado, out respuestoBuscado))
+        {
+            Console.WriteLine("Se encontro el repuesto");
+            Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
+        }
+        else
+        {
+            Console.WriteLine("No se encontro el repuesto");
+        }
+    }
+}
 
 
 
+void ListarRepuestos(TallerContext contextoTaller)
+{
+   List<Repuesto> listaRepuestos = contextoTaller.Repuestos.ToList();
 
+    for (int i = 0; listaRepuestos.Count > i; i++)
+    {
+        Console.WriteLine($"{listaRepuestos[i].Nombre}");
+        Console.WriteLine($"{listaRepuestos[i].Codigo}");
+        Console.WriteLine($"{listaRepuestos[i].Stock}");
+        Console.WriteLine($"{listaRepuestos[i].Precio}");
+    }
+
+}
+
+void ActualizarStock(string? codigoIngresadoaEditar, Dictionary<string,Repuesto> diccionarioRepuesto, TallerContext contexto )
+{
+    if (string.IsNullOrWhiteSpace(codigoIngresadoaEditar))
+    {
+        Console.WriteLine("Ingrese un codigo valido");
+    }
+    else if (diccionarioRepuesto.TryGetValue(codigoIngresadoaEditar.ToUpper().Trim(), out Repuesto repuestoEncontrado))
+    {
+        Console.WriteLine("Ingrese el nuevo stock del repuesto");
+
+        if (int.TryParse(Console.ReadLine(), out int stockActualizado))
+        {
+            if (stockActualizado >= 0)
+            {
+                Console.WriteLine($"Stock anterior {repuestoEncontrado.Stock}");
+                repuestoEncontrado.Stock = stockActualizado;
+                contexto.SaveChanges();
+                Console.WriteLine($"Stock actualizado {repuestoEncontrado.Stock}");
+                Console.WriteLine("Stock actualizado correctamente");
+            }
+            else
+            {
+                Console.WriteLine("Ingrese un stock mayor o igual a 0");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Ingrese un stock valido");
+        }
+
+    }
+    else
+    {
+        Console.WriteLine("No se encontro el repuesto");
+    }
+}
+
+bool AgreggarRepuesto(string? codigoIngresado)
+{
+    if (string.IsNullOrWhiteSpace(codigoIngresado))
+    {
+        Console.WriteLine("Ingrese un codigo valido");
+    }
+    else
+    {
+        string codigoNormalizado = codigoIngresado.ToUpper().Trim();
+
+        if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
+        {
+            Console.WriteLine("El codigo ya esta registrado");
+        }
+        else
+        {
+            codigoValido = codigoNormalizado;
+            validador = false;
+        }
+
+    }
+    return validador
+}
