@@ -81,7 +81,8 @@ do
                 break;
 
             case 2:
-               
+
+                string codigoValidoTemp;
 
                 do
                 {
@@ -89,9 +90,10 @@ do
                     string? codigoIngresado = Console.ReadLine();
 
 
+                    continuarPrograma = TryObtenerCodigoValido(codigoIngresado, diccionarioRepuesto, out codigoValidoTemp);
 
-                   
-                } while (validador);
+
+                } while (continuarPrograma);
                 do
                 {
                     Console.WriteLine("Ingrese el nombre del repuesto a agregar");
@@ -299,7 +301,7 @@ void ActualizarStock(string? codigoIngresadoaEditar, Dictionary<string,Repuesto>
     }
 }
 
-bool AgreggarRepuesto(string? codigoIngresado)
+bool AgreggarRepuesto(string? codigoIngresado, bool validador)
 {
     if (string.IsNullOrWhiteSpace(codigoIngresado))
     {
@@ -320,5 +322,28 @@ bool AgreggarRepuesto(string? codigoIngresado)
         }
 
     }
-    return validador
+    return validador;
 }
+
+bool TryObtenerCodigoValido(string? codigoNuevo,Dictionary<string,Repuesto> diccionarioRepuesto, out string codigoValido)
+{
+    if (string.IsNullOrWhiteSpace(codigoNuevo))
+    {
+        Console.WriteLine("Ingrese codigo valido");
+        codigoValido = "";
+        return true;
+    }
+    string codigoNormalizado = codigoNuevo.ToUpper().Trim();
+    if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
+    {
+        Console.WriteLine("El codigo ya esta registrado");
+        codigoValido = "";
+        return true;
+    }
+        codigoValido = codigoNormalizado;
+        return false;
+}
+
+
+
+
