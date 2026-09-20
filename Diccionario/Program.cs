@@ -40,6 +40,10 @@ for (int i = 0;i< ListaRepuestos.Count; i++)
 }
 
 bool continuarPrograma = true;
+bool validadorcodigo = true;
+bool validadorNombre = true;
+bool validadorStock = true;
+bool validadorPrecio = true;
 
 do
 {
@@ -62,7 +66,7 @@ do
     string codigoValido = "";
     string nombreValido = "";
     int stockValido = 0;
-    decimal decimalValido = 0;
+    decimal precioValido = 0;
 
     if (int.TryParse(opcionIntroducida, out opcionSeleccionada))
     {
@@ -90,100 +94,54 @@ do
                     string? codigoIngresado = Console.ReadLine();
 
 
-                    continuarPrograma = TryObtenerCodigoValido(codigoIngresado, diccionarioRepuesto, out codigoValidoTemp);
+                    validadorcodigo = TryObtenerCodigoValido(codigoIngresado, diccionarioRepuesto, out codigoValidoTemp);
 
 
-                } while (continuarPrograma);
+                } while (validadorcodigo);
                 do
                 {
                     Console.WriteLine("Ingrese el nombre del repuesto a agregar");
                     string? nombreIngresado = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(nombreIngresado))
-                    {
-                        Console.WriteLine("Ingrese un nombre valido");
-                        validador = true;
-                    }
-                    else
-                    {
-                        validador = false;
-                        string nombreNormalizado = nombreIngresado.ToUpper().Trim();
-                        nombreValido = nombreNormalizado;
-                    }
+                   validadorNombre = TryObtenerNombreValido(nombreIngresado, out nombreValido);
 
-                } while (validador);
+
+                } while (validadorNombre);
 
                 do
                 {
                     Console.WriteLine("Ingrese el stock del repuesto a agregar");
                     string? stockIngresado = Console.ReadLine();
-                    if (int.TryParse(stockIngresado, out int stock))
-                    {
-                        if (stock > 0)
-                        {
-                            validador = false;
-                            stockValido = stock;
+                    validadorStock = TryObtenerStockValido(stockIngresado, out stockValido);
 
-                        }
-                        else
-                        {
-                            Console.WriteLine("Ingrese un stock mayor a 0");
-                            validador = true;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ingrese un stock valido");
-                        validador = true;
-                    }
-
-                } while (validador);
+                } while (validadorStock);
 
 
                 do
                 {
                     Console.WriteLine("Ingrese el precio del repuesto a agregar");
                     string? precioIngresado = Console.ReadLine();
-                    if (decimal.TryParse(precioIngresado, out decimal precio))
-                    {
-                        if (precio > 0)
-                        {
-                            validador = false;
-                            decimalValido = precio;
-                        }
-                        else
-                        {
-                            validador = true;
-                            Console.WriteLine("Ingrese un precio mayor a 0");
-                        }
-
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("Ingrese un precio valido");
-                        validador = true;
-                    }
-                } while (validador);
+                    validadorPrecio  = TryObtenerPrecioValido(precioIngresado, out precioValido);
+                } while (validadorPrecio);
 
                 Repuesto nuevoRespuesto = new Repuesto
                 {
-                    Codigo = codigoValido,
+                    Codigo = codigoValidoTemp,
                     Nombre = nombreValido,
                     Stock = stockValido,
-                    Precio = decimalValido,
+                    Precio = precioValido,
                     Estado = true
                 };
 
                 contexto.Repuestos.Add(nuevoRespuesto);
                 contexto.SaveChanges();
               
-                diccionarioRepuesto.Add(codigoValido, nuevoRespuesto);
+                diccionarioRepuesto.Add(codigoValidoTemp, nuevoRespuesto);
 
                 Console.WriteLine("Repesto agregado correctamente");
-                Console.WriteLine($"Codigo:{codigoValido}");
+                Console.WriteLine($"Codigo:{codigoValidoTemp}");
                 Console.WriteLine($"Nombre:{nombreValido}");
                 Console.WriteLine($"Stock:{stockValido}");
-                Console.WriteLine($"Precio:{decimalValido}");
+                Console.WriteLine($"Precio:{precioValido}");
 
                 
                 break;
@@ -206,6 +164,13 @@ do
                 ActualizarStock(codigoIngresadoaEditar, diccionarioRepuesto, contexto);
 
                 break;
+            case 6:
+                Console.WriteLine("Ingrese el codigo a eliminar");
+                string? codigoIngresadoaEliminar = Console.ReadLine();
+
+                TryObtenerCodigoValidoParaEliminar()
+
+
 
             default:
                 Console.WriteLine("Ingrese una opcion valida");
@@ -301,29 +266,6 @@ void ActualizarStock(string? codigoIngresadoaEditar, Dictionary<string,Repuesto>
     }
 }
 
-bool AgreggarRepuesto(string? codigoIngresado, bool validador)
-{
-    if (string.IsNullOrWhiteSpace(codigoIngresado))
-    {
-        Console.WriteLine("Ingrese un codigo valido");
-    }
-    else
-    {
-        string codigoNormalizado = codigoIngresado.ToUpper().Trim();
-
-        if (diccionarioRepuesto.ContainsKey(codigoNormalizado))
-        {
-            Console.WriteLine("El codigo ya esta registrado");
-        }
-        else
-        {
-            codigoValido = codigoNormalizado;
-            validador = false;
-        }
-
-    }
-    return validador;
-}
 
 bool TryObtenerCodigoValido(string? codigoNuevo,Dictionary<string,Repuesto> diccionarioRepuesto, out string codigoValido)
 {
@@ -345,5 +287,94 @@ bool TryObtenerCodigoValido(string? codigoNuevo,Dictionary<string,Repuesto> dicc
 }
 
 
+bool TryObtenerNombreValido(string?nombreIngresado, out string nombreValido)
+{
+    if (string.IsNullOrWhiteSpace(nombreIngresado))
+    {
+        Console.WriteLine("Ingrese un nombre valido");
+        nombreValido = "";
+        return true;
+    }
+    string nombreNormalizado= nombreIngresado.ToUpper().Trim();
+    nombreValido = nombreNormalizado;
+    return false;
+}
+
+bool TryObtenerStockValido(string?stockIngresado, out int stockValido)
+{
+    if (int.TryParse(stockIngresado, out int stockConvertido))
+    {
+        if (stockConvertido > 0)
+        {
+            stockValido = stockConvertido;
+            return false;
+        }
+        else
+        {
+            Console.WriteLine("Ingrese un stock mayor a 0");
+            stockValido = 0;
+            return true;
+        }
+    }
+    else
+    {
+        Console.WriteLine("Ingrese un stock valido");
+        stockValido = 0;
+        return true;
+    }
+
+}
+
+bool TryObtenerPrecioValido(string? precioIngresado, out decimal precioValido)
+{
+   if(decimal.TryParse(precioIngresado, out decimal precioConvertido))
+    {
+        if (precioConvertido > 0)
+        {
+            precioValido = precioConvertido;
+            return false;
+        }
+        else
+        {
+            Console.WriteLine("Ingrese un precio mayor a 0");
+            precioValido = 0;
+            return true;
+        }
+    }
+    else
+    {
+        Console.WriteLine("Ingrese un precio valido");
+        precioValido = 0;
+        return true;
+    }
+}
+
+bool TryObtenerCodigoValidoParaEliminar(string ? codigoIngresado,TallerContext contextoTaller, out Repuesto? respuestoEncontrado )
+{
+    if (string.IsNullOrWhiteSpace(codigoIngresado))
+    {
+         Console.WriteLine("Ingrese un codigo valido");
+        respuestoEncontrado = null;
+        return false;
+    }
+    string codigoNormalizado = codigoIngresado.ToUpper().Trim();
+
+    List<Repuesto> listaRepuestos = contextoTaller.Repuestos.ToList();
+
+    for (int i = 0; listaRepuestos.Count > i; i++)
+    {
+        if (listaRepuestos[i].Codigo == codigoNormalizado)
+        {
+            listaRepuestos[i].Estado = false;
+            contextoTaller.SaveChanges();
+            Console.WriteLine("Repuesto eliminado correctamente");
+            respuestoEncontrado = listaRepuestos[i];
+            return false;
+        }
+       
+    }
+    respuestoEncontrado = null;
+    return true;
+}
 
 
