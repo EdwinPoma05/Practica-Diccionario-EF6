@@ -437,3 +437,25 @@ void OrdenDescendeteStockPorRepuesto(TallerContext contexto)
     }
     
 }
+
+void NombreRepuestos(TallerContext contexto)
+{
+     List<string> listaNombres =contexto.Repuestos.Where(r=>r.Estado==true).OrderBy(r=>r.Nombre).Select(r => r.Nombre).ToList();
+    
+     for(int i = 0; listaNombres.Count > i; i++)
+    {
+        Console.WriteLine($"{listaNombres[i]}");
+    }
+    
+}
+
+void NombresYStock(TallerContext contexto)
+{
+   var lista= contexto.Repuestos.Where(r => r.Estado == true).OrderBy(r => r.Nombre).Select(r=>new {r.Nombre,r.Stock }).ToList();
+
+    for(int i = 0; lista.Count > i; i++)
+    {
+        Console.WriteLine($"{lista[i].Nombre}");
+        Console.WriteLine($"{lista[i].Stock}");
+    }
+}
