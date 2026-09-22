@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Diccionario;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 Repuesto respuesto = new Repuesto
 {
@@ -44,6 +45,7 @@ bool validadorcodigo = true;
 bool validadorNombre = true;
 bool validadorStock = true;
 bool validadorPrecio = true;
+bool validarRepuestoEliminado=true;
 
 do
 {
@@ -57,6 +59,8 @@ do
     Console.WriteLine("3.- Listar Respuestos");
     Console.WriteLine("4.- Salir");
     Console.WriteLine("5.- Actualizar stock de repuesto");
+    Console.WriteLine("6.- Eliminar repuesto");
+    Console.WriteLine("7.- Hay Respuestos sin stock");
 
 
     string? opcionIntroducida = Console.ReadLine();
@@ -73,9 +77,6 @@ do
         switch (opcionSeleccionada)
         {
             case 1:
-
-
-
                 Console.WriteLine("Ingrese el código del repuesto a buscar");
                 
                 string? codigo = Console.ReadLine();
@@ -165,12 +166,32 @@ do
 
                 break;
             case 6:
-                Console.WriteLine("Ingrese el codigo a eliminar");
-                string? codigoIngresadoaEliminar = Console.ReadLine();
+                
+                do
+                {
+                    Console.WriteLine("Ingrese el codigo a eliminar");
+                    string? codigoIngresadoaEliminar = Console.ReadLine();
+                    Repuesto? repuestoEncontrado;
+                    validarRepuestoEliminado = TryObtenerCodigoValidoParaEliminar(codigoIngresadoaEliminar, contexto, out repuestoEncontrado);
 
-                TryObtenerCodigoValidoParaEliminar()
+                } while (validarRepuestoEliminado);
 
 
+             break;
+
+            case 7:
+                bool existeRepuestoSinStock =HayRespuestosSinStock(contexto); 
+                if (existeRepuestoSinStock)
+                {
+                    Console.WriteLine("Si hay repuestos con stock 0");
+                }
+                else
+                {
+                    Console.WriteLine("No hay repuestos con stock 0");
+
+                }
+
+                break;
 
             default:
                 Console.WriteLine("Ingrese una opcion valida");
@@ -203,8 +224,17 @@ void BuscarRepuestos(string? codigoBuscado, Dictionary<string, Repuesto> diccion
         string codigoNormalizado = codigoBuscado.ToUpper().Trim();
         if (diccionarioRepuesto.TryGetValue(codigoNormalizado, out respuestoBuscado))
         {
-            Console.WriteLine("Se encontro el repuesto");
-            Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
+            if (respuestoBuscado.Estado==true)
+            {
+                Console.WriteLine("Se encontro el repuesto");
+                Console.WriteLine($"Nombre: {respuestoBuscado.Nombre} Stock: {respuestoBuscado.Stock} Precio: {respuestoBuscado.Precio}");
+            }
+            else
+            {
+                Console.WriteLine("No se encontro el repuesto");
+                
+            }
+
         }
         else
         {
@@ -217,7 +247,7 @@ void BuscarRepuestos(string? codigoBuscado, Dictionary<string, Repuesto> diccion
 
 void ListarRepuestos(TallerContext contextoTaller)
 {
-   List<Repuesto> listaRepuestos = contextoTaller.Repuestos.ToList();
+   List<Repuesto> listaRepuestos = contextoTaller.Repuestos.Where(r=>r.Estado==true).OrderBy(r=>r.Nombre).ToList();
 
     for (int i = 0; listaRepuestos.Count > i; i++)
     {
@@ -237,28 +267,36 @@ void ActualizarStock(string? codigoIngresadoaEditar, Dictionary<string,Repuesto>
     }
     else if (diccionarioRepuesto.TryGetValue(codigoIngresadoaEditar.ToUpper().Trim(), out Repuesto repuestoEncontrado))
     {
-        Console.WriteLine("Ingrese el nuevo stock del repuesto");
-
-        if (int.TryParse(Console.ReadLine(), out int stockActualizado))
+        if (repuestoEncontrado.Estado == true)
         {
-            if (stockActualizado >= 0)
+            Console.WriteLine("Ingrese el nuevo stock del repuesto");
+
+            if (int.TryParse(Console.ReadLine(), out int stockActualizado))
             {
-                Console.WriteLine($"Stock anterior {repuestoEncontrado.Stock}");
-                repuestoEncontrado.Stock = stockActualizado;
-                contexto.SaveChanges();
-                Console.WriteLine($"Stock actualizado {repuestoEncontrado.Stock}");
-                Console.WriteLine("Stock actualizado correctamente");
+
+
+                if (stockActualizado >= 0)
+                {
+                    Console.WriteLine($"Stock anterior {repuestoEncontrado.Stock}");
+                    repuestoEncontrado.Stock = stockActualizado;
+                    contexto.SaveChanges();
+                    Console.WriteLine($"Stock actualizado {repuestoEncontrado.Stock}");
+                    Console.WriteLine("Stock actualizado correctamente");
+                }
+                else
+                {
+                    Console.WriteLine("Ingrese un stock mayor o igual a 0");
+                }
             }
             else
             {
-                Console.WriteLine("Ingrese un stock mayor o igual a 0");
+                Console.WriteLine("Ingrese un stock valido");
             }
         }
         else
         {
-            Console.WriteLine("Ingrese un stock valido");
+            Console.WriteLine("No se encontro el repuesto");
         }
-
     }
     else
     {
@@ -358,24 +396,44 @@ bool TryObtenerCodigoValidoParaEliminar(string ? codigoIngresado,TallerContext c
         return true;
     }
     string codigoNormalizado = codigoIngresado.ToUpper().Trim();
+    Repuesto? respuestoaEliminarEnContrado= contextoTaller.Repuestos.FirstOrDefault(r => r.Codigo.ToUpper().Trim() == codigoNormalizado && r.Estado==true);
 
-    List<Repuesto> listaRepuestos = contextoTaller.Repuestos.ToList();
-
-    for (int i = 0; listaRepuestos.Count > i; i++)
+    if(respuestoaEliminarEnContrado!= null)
     {
-        if (listaRepuestos[i].Codigo == codigoNormalizado)
-        {
-            listaRepuestos[i].Estado = false;
-            contextoTaller.SaveChanges();
-            Console.WriteLine("Repuesto eliminado correctamente");
-            respuestoEncontrado = listaRepuestos[i];
-            return false;
-        }
-       
+        respuestoaEliminarEnContrado.Estado = false;
+        contextoTaller.SaveChanges();
+        Console.WriteLine("Repuesto eliminado correctamente");
+        respuestoEncontrado= respuestoaEliminarEnContrado;
+        return false;
+
     }
+
     Console.WriteLine("No se encontro el repuesto");
     respuestoEncontrado = null;
     return true;
 }
+bool HayRespuestosSinStock(TallerContext contexto)
+{
+    return contexto.Repuestos.Any(r => r.Stock == 0 && r.Estado == true);
+}
+int CantidadRepuestosActivo (TallerContext contexto)
+{
+    return contexto.Repuestos.Count(r=>r.Estado==true);
+}
 
+int CantidadStockTotal (TallerContext contexto)
+{
+    return contexto.Repuestos.Where(r=>r.Estado==true).Sum(r=>r.Stock);
+}
 
+void OrdenDescendeteStockPorRepuesto(TallerContext contexto)
+{
+    List<Repuesto> lista = contexto.Repuestos.Where(r=>r.Estado==true).OrderByDescending(r => r.Stock).ToList();
+    
+    for(int i = 0; lista.Count > i; i++)
+    {
+        Console.WriteLine($"{lista[i].Codigo}");
+        Console.WriteLine($"{lista[i].Stock}");
+    }
+    
+}
