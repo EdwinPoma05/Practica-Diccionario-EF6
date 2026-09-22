@@ -355,7 +355,7 @@ bool TryObtenerCodigoValidoParaEliminar(string ? codigoIngresado,TallerContext c
     {
          Console.WriteLine("Ingrese un codigo valido");
         respuestoEncontrado = null;
-        return false;
+        return true;
     }
     string codigoNormalizado = codigoIngresado.ToUpper().Trim();
 
@@ -373,6 +373,7 @@ bool TryObtenerCodigoValidoParaEliminar(string ? codigoIngresado,TallerContext c
         }
        
     }
+    Console.WriteLine("No se encontro el repuesto");
     respuestoEncontrado = null;
     return true;
 }
