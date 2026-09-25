@@ -61,6 +61,7 @@ do
     Console.WriteLine("5.- Actualizar stock de repuesto");
     Console.WriteLine("6.- Eliminar repuesto");
     Console.WriteLine("7.- Hay Respuestos sin stock");
+    Console.WriteLine("8.- Resumen de inventario");
 
 
     string? opcionIntroducida = Console.ReadLine();
@@ -193,6 +194,14 @@ do
 
                 break;
 
+            case 8:
+                ResumenInventario resumen = ResumenDeInventario(contexto);
+                Console.WriteLine($"Tenemos {resumen.CantidadRepuestos} tipos de repuestos");
+                Console.WriteLine($"Tenemos {resumen.stockTotal} en total ");
+                Console.WriteLine($"Tenemos un promedio de {resumen.PromedioStockGeneral} de stock en totla");
+                Console.WriteLine($"El repuesto que tiene stock mayor es {resumen.StockMayor.Nombre} con {resumen.StockMayor.Stock} de stock");
+                Console.WriteLine($"El repuesto que tiene menor stock es {resumen.StockMenor.Nombre} con {resumen.StockMenor.Stock}");
+                break;
             default:
                 Console.WriteLine("Ingrese una opcion valida");
                 continuarPrograma = true;
@@ -458,4 +467,57 @@ void NombresYStock(TallerContext contexto)
         Console.WriteLine($"{lista[i].Nombre}");
         Console.WriteLine($"{lista[i].Stock}");
     }
+}
+
+
+Repuesto? RepuestoConMayorStock(TallerContext contexto)
+{
+    Repuesto? RepuestoMayorStock= contexto.Repuestos.Where(r => r.Estado == true).OrderByDescending(r => r.Stock).FirstOrDefault();
+    return RepuestoMayorStock;
+}
+
+Repuesto? RepuestoConMenorStock(TallerContext contexto)
+{
+    Repuesto? repuestoMenorStock = contexto.Repuestos.Where(r => r.Estado == true).OrderBy(r => r.Stock).FirstOrDefault();
+    return repuestoMenorStock;
+}
+
+double PromedioStock (TallerContext contexto)
+{
+    if (contexto.Repuestos.Any(r => r.Estado))
+    {
+        return contexto.Repuestos.Where(r => r.Estado == true).Average(r => r.Stock);
+    }
+    return 0;
+    
+}
+
+ResumenInventario ResumenDeInventario(TallerContext contexto)
+{
+    if (contexto.Repuestos.Where(r => r.Estado).Any())
+    {
+        int repuestosActivos=contexto.Repuestos.Where(r => r.Estado).Count();
+        int tockGeneral=contexto.Repuestos.Where(r => r.Estado).Sum(r => r.Stock);
+        double promedioStock=contexto.Repuestos.Where(r => r.Estado).Average(r => r.Stock);
+        Repuesto ?stockMayor=contexto.Repuestos.Where(r => r.Estado).OrderByDescending(r => r.Stock).FirstOrDefault();
+        Repuesto? stockMenor=contexto.Repuestos.Where(r => r.Estado).OrderBy(r => r.Stock).FirstOrDefault();
+
+        ResumenInventario resumen = new ResumenInventario
+        {
+            CantidadRepuestos = repuestosActivos,
+            stockTotal = tockGeneral,
+            PromedioStockGeneral = promedioStock,
+            StockMayor = stockMayor,
+            StockMenor = stockMenor,
+        };
+
+        return resumen;
+        
+    }
+    else
+    {
+        return new ResumenInventario();
+    }
+
+    
 }
