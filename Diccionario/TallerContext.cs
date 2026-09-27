@@ -11,6 +11,7 @@ namespace Diccionario
     {
         public DbSet<Repuesto> Repuestos { get; set; }
 
+        public DbSet<Proveedor> Proveedor { get; set; }
 
         public TallerContext() : base("name=ConexionBasedeDatosTaller")
         {

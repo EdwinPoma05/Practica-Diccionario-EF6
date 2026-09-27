@@ -46,6 +46,7 @@ bool validadorNombre = true;
 bool validadorStock = true;
 bool validadorPrecio = true;
 bool validarRepuestoEliminado=true;
+bool validadorProveedor = true;
 
 do
 {
@@ -62,6 +63,7 @@ do
     Console.WriteLine("6.- Eliminar repuesto");
     Console.WriteLine("7.- Hay Respuestos sin stock");
     Console.WriteLine("8.- Resumen de inventario");
+    Console.WriteLine("9.- Agregar Proveedor");
 
 
     string? opcionIntroducida = Console.ReadLine();
@@ -199,8 +201,14 @@ do
                 Console.WriteLine($"Tenemos {resumen.CantidadRepuestos} tipos de repuestos");
                 Console.WriteLine($"Tenemos {resumen.stockTotal} en total ");
                 Console.WriteLine($"Tenemos un promedio de {resumen.PromedioStockGeneral} de stock en totla");
-                Console.WriteLine($"El repuesto que tiene stock mayor es {resumen.StockMayor.Nombre} con {resumen.StockMayor.Stock} de stock");
-                Console.WriteLine($"El repuesto que tiene menor stock es {resumen.StockMenor.Nombre} con {resumen.StockMenor.Stock}");
+                Console.WriteLine($"El repuesto que tiene stock mayor es {resumen.StockMayor?.Nombre??"no hay"} con {resumen.StockMayor?.Stock??0} de stock");
+                Console.WriteLine($"El repuesto que tiene menor stock es {resumen.StockMenor?.Nombre??"No hay"} con {resumen.StockMenor?.Stock??0} de stock");
+                break;
+            case 9:
+                AgregarProveedor(contexto);
+                break;
+            case 10:
+                VincularRepuestoProveedor(contexto);
                 break;
             default:
                 Console.WriteLine("Ingrese una opcion valida");
@@ -520,4 +528,71 @@ ResumenInventario ResumenDeInventario(TallerContext contexto)
     }
 
     
+}
+
+void AgregarProveedor(TallerContext contexto)
+{
+    do
+    {
+        Console.WriteLine("Ingrese el nombre del Proveedor ");
+        string? proveedorIngresado = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(proveedorIngresado))
+        {
+            Console.WriteLine("Por favor ingresar un Proveedor valido");
+            validadorProveedor = true;
+        }
+        else if (contexto.Proveedor.Any(p => p.Nombre.ToUpper().Trim() == proveedorIngresado.ToUpper().Trim()))
+        {
+            Console.WriteLine("El Proveedor que trata de agregar ya existe");
+            validadorProveedor = false;
+        }
+        else
+        {
+            Proveedor proveedor = new Proveedor
+            {
+                Nombre = proveedorIngresado
+            };
+            contexto.Proveedor.Add(proveedor);
+            contexto.SaveChanges();
+            Console.WriteLine("Proveedor Ingresado Correctamente");
+            validadorProveedor = false;
+
+        }
+    } while (validadorProveedor);
+    
+        
+
+}
+
+
+void VincularRepuestoProveedor(TallerContext contexto)
+{
+    bool codigo = true;
+    Console.WriteLine("Ingresar codigo del Repuesto");
+    string? codigoIngresado10=Console.ReadLine();
+    if (string.IsNullOrWhiteSpace(codigoIngresado10))
+    {
+        Console.WriteLine("Ingresar un codigo valido");
+    }
+    else if (contexto.Repuestos.Where(r=>r.Codigo== codigoIngresado10).Any())
+    {
+        Repuesto?repuestoEnontrado=contexto.Repuestos.Where(r => r.Codigo == codigoIngresado10).FirstOrDefault();
+        Console.WriteLine("Ingrese el Proveedor ");
+        string?proveedorIngresado=Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(proveedorIngresado))
+        {
+            Console.WriteLine("Ingrese un Proveedor valido");
+        }else if (contexto.Proveedor.Where(p=>p.Nombre.ToUpper().Trim()==proveedorIngresado.ToUpper().Trim()).Any())
+        {
+           Proveedor?ProveedorEncontrado= contexto.Proveedor.Where(p => p.Nombre.ToUpper().Trim() == proveedorIngresado.ToLower().Trim()).FirstOrDefault();
+            repuestoEnontrado.ProveedorId = ProveedorEncontrado.Id;
+            contexto.SaveChanges();
+        }
+        else
+        {
+            Console.WriteLine("No se encontro el Proveedor ");
+        }
+        
+            
+    }
 }

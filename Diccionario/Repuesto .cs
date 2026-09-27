@@ -16,5 +16,9 @@ namespace Diccionario
         public int Stock {  get; set; }
         public decimal Precio { get; set; }
         public bool Estado { get; set; }
+
+        [ForeignKey("Proveedor")]
+        public int? ProveedorId {  get; set; }
+        public virtual Proveedor Proveedor { get; set; }
     }
 }
